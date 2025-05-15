@@ -1,0 +1,9 @@
+arg1: {
+  "process_id": arg2,
+  "arguments": {
+    "x": {
+      "from_node": arg3
+    },
+    arg4
+  }
+}

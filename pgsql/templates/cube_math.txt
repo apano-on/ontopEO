@@ -1,0 +1,27 @@
+arg1: {
+      "process_id": "merge_cubes",
+      "arguments": {
+        "cube1": {
+          "from_node": arg2
+        },
+        "cube2": {
+          "from_node": arg3
+        },
+        "overlap_resolver": {
+          "process_graph": {
+            "subtract1": {
+              "process_id": arg4,
+              "arguments": {
+                "x": {
+                  "from_parameter": "x"
+                },
+                "y": {
+                  "from_parameter": "y"
+                }
+              },
+              "result": true
+            }
+          }
+        }
+      }
+    }

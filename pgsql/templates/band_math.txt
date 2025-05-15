@@ -1,0 +1,15 @@
+arg1: {
+      "process_id": "reduce_dimension",
+      "arguments": {
+        "data": {
+          "from_node": arg2
+        },
+        "reducer": {
+          "process_graph":
+            arg3
+
+
+      },
+      "dimension": "bands"
+            }
+        }

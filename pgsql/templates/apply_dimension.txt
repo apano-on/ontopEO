@@ -1,0 +1,24 @@
+arg1: {
+      "process_id": arg2,
+      "arguments": {
+        "data": {
+          "from_node": arg3
+        },
+        "dimension": arg4,
+        "process": {
+          "process_graph": {
+            "run1": {
+              "process_id": "run_udf",
+              "arguments": {
+                "data": {
+                  "from_parameter": "data"
+                },
+                "runtime": "Python",
+                "udf": arg5
+              },
+              "result": true
+            }
+          }
+        }
+      }
+    }

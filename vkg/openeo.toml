@@ -1,0 +1,255 @@
+title="Ontop OpenEO Queries"
+
+[[tabGroups]]
+
+name="Sample Queries"
+
+[[tabGroups.tabs]]
+
+name="Q1. NDVI"
+query="""
+# Find NDVI for Val Venosta region municipalities
+PREFIX : <http://www.unibz-openeo.org#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX openeo: <http://www.openeo-ontop.org#>
+
+SELECT ?municipalityName ?average_NDVI ?geom {
+?municipality a :SouthTyrolMuni .
+?municipality geo:asWKT ?geom .
+?municipality rdfs:label ?municipalityName .
+FILTER(LANG(?municipalityName) = "it")
+?municipality :belongsToDistrict ?districtName .
+FILTER(LANG(?districtName) = "it" && (STR(?districtName) = "Val Venosta")) .
+BIND ("2025-04-05T00:00:00Z"^^xsd:dateTime AS ?start_time) .
+BIND ("2025-04-15T00:00:00Z"^^xsd:dateTime AS ?end_time) .
+BIND ("SENTINEL2_L2A" AS ?satellite) .
+BIND ("[B04, B08]" AS ?band1) .
+BIND (openeo:load_collection(?satellite, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
+BIND (openeo:ndvi(?coll1) AS ?coll2) .
+BIND (openeo:reduce_dimension(?coll2, "t", "mean") AS ?coll3) .
+BIND (openeo:aggregate_spatial(?coll3, "t", "mean") AS ?v) .
+BIND (xsd:double(?v) AS ?average_NDVI)
+}
+"""
+
+[[tabGroups.tabs]]
+
+name="Q2. Heatwave"
+query="""
+PREFIX : <http://www.unibz-openeo.org#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX openeo: <http://www.openeo-ontop.org#>
+
+SELECT ?neighborhoodName ?heatwaveData ?geom {
+?neighborhood a :DutchNeighborhood .
+?neighborhood geo:asWKT ?geom .
+?neighborhood rdfs:label ?neighborhoodName .
+?neighborhood :belongsToMunicipality ?municipalityName .
+FILTER(LANG(?municipalityName) = "nl" && (STR(?municipalityName) = "Krimpen aan den IJssel")) .
+BIND ("2023-06-01T00:00:00Z"^^xsd:dateTime AS ?start_time) .
+BIND ("2023-10-30T00:00:00Z"^^xsd:dateTime AS ?end_time) .
+BIND ("SENTINEL3_SLSTR_L2_LST" AS ?satellite_instrument) .
+BIND ("LST" AS ?band1) .
+BIND ("confidence_in" AS ?band2) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band2) AS ?coll2) .
+BIND (openeo:apply(?coll2 >= 16384) AS ?coll3) .
+BIND (openeo:mask(?coll1, ?coll3) AS ?coll4) .
+BIND ("import xarray\\nimport numpy as np\\nfrom openeo.udf import inspect\\n\\ndef apply_datacube(cube: xarray.DataArray, context: dict) -> xarray.DataArray:\\n    \\n    array = cube.values\\n    inspect(data=[array.shape], message = \\\"Array dimensions\\\")\\n    res_arr=np.zeros(array.shape)\\n    for i in range(array.shape[0]-4):\\n        ar_sub=np.take(array,  range(i, i+5), axis=0)\\n        res_arr[i]=(np.all(ar_sub>295,axis=0)) & (np.nansum(ar_sub>300,axis=0)>2)\\n    return xarray.DataArray(res_arr, dims=cube.dims, coords=cube.coords)" AS ?udf) .
+BIND (openeo:apply_dimension(?coll4, "t", ?udf) AS ?coll5) .
+BIND (openeo:reduce_dimension(?coll5, "t", "sum") AS ?heatwaveData) .
+}
+"""
+
+[[tabGroups.tabs]]
+
+name="Q3. Wildfire"
+query="""
+# Find landslides by municipality in Ischia, Campania, Italy
+PREFIX : <http://www.unibz-openeo.org#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX openeo: <http://www.openeo-ontop.org#>
+
+SELECT ?municipalityName ?landslideData {
+?municipality a :CampaniaMuni .
+?municipality geo:asWKT ?geom .
+?municipality rdfs:label ?municipalityName .
+FILTER(LANG(?municipalityName) = "it" && (STR(?municipalityName) = "Ischia") || (STR(?municipalityName) = "Casamicciola Terme") || (STR(?municipalityName) = "Lacco Ameno")
+|| (STR(?municipalityName) = "Forio") || (STR(?municipalityName) = "Barano d'Ischia") || (STR(?municipalityName) = "Serrara Fontana")) .
+BIND ("2022-08-25T00:00:00Z"^^xsd:dateTime AS ?start_time) .
+BIND ("2022-11-25T00:00:00Z"^^xsd:dateTime AS ?end_time) .
+BIND ("2022-11-26T00:00:00Z"^^xsd:dateTime AS ?start_time2) .
+BIND ("2022-12-25T00:00:00Z"^^xsd:dateTime AS ?end_time2) .
+BIND ("SENTINEL2_L2A" AS ?satellite_instrument) .
+BIND ("[B04, B08]" AS ?band1) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
+BIND (openeo:ndvi(?coll1) AS ?coll2) .
+BIND (openeo:reduce_dimension(?coll2, "t", "mean") AS ?coll3) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time2, ?end_time2, ?band1) AS ?coll4) .
+BIND (openeo:ndvi(?coll4) AS ?coll5) .
+BIND (openeo:reduce_dimension(?coll5, "t", "mean") AS ?coll6) .
+BIND (openeo:merge_cubes(?coll6, ?coll3, "subtract") AS ?landslideData) .
+}
+"""
+
+[[tabGroups.tabs]]
+
+name="Q4. Landslides"
+query="""
+# Find landslides by municipality in Ischia, Campania, Italy
+PREFIX : <http://www.unibz-openeo.org#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX openeo: <http://www.openeo-ontop.org#>
+
+SELECT ?municipalityName ?landslideData {
+?municipality a :CampaniaMuni .
+?municipality geo:asWKT ?geom .
+?municipality rdfs:label ?municipalityName .
+FILTER(LANG(?municipalityName) = "it" && (STR(?municipalityName) = "Ischia") || (STR(?municipalityName) = "Casamicciola Terme") || (STR(?municipalityName) = "Lacco Ameno")
+|| (STR(?municipalityName) = "Forio") || (STR(?municipalityName) = "Barano d'Ischia") || (STR(?municipalityName) = "Serrara Fontana")) .
+BIND ("2022-08-25T00:00:00Z"^^xsd:dateTime AS ?start_time) .
+BIND ("2022-11-25T00:00:00Z"^^xsd:dateTime AS ?end_time) .
+BIND ("2022-11-26T00:00:00Z"^^xsd:dateTime AS ?start_time2) .
+BIND ("2022-12-25T00:00:00Z"^^xsd:dateTime AS ?end_time2) .
+BIND ("SENTINEL2_L2A" AS ?satellite_instrument) .
+BIND ("[B04, B08]" AS ?band1) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
+BIND (openeo:ndvi(?coll1) AS ?coll2) .
+BIND (openeo:reduce_dimension(?coll2, "t", "mean") AS ?coll3) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time2, ?end_time2, ?band1) AS ?coll4) .
+BIND (openeo:ndvi(?coll4) AS ?coll5) .
+BIND (openeo:reduce_dimension(?coll5, "t", "mean") AS ?coll6) .
+BIND (openeo:merge_cubes(?coll6, ?coll3, "subtract") AS ?landslideData) .
+}
+"""
+
+[[tabGroups.tabs]]
+
+name="Q5. Radar Vegetation Index"
+query="""
+# Find Radar Vegetation Index in  South Tyrol
+PREFIX : <http://www.unibz-openeo.org#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX openeo: <http://www.openeo-ontop.org#>
+
+SELECT ?municipalityName ?RVIData {
+?municipality a :SouthTyrolMuni .
+?municipality geo:asWKT ?geom .
+?municipality rdfs:label ?municipalityName .
+FILTER(LANG(?municipalityName) = "it")
+?municipality :belongsToDistrict ?districtName .
+FILTER(LANG(?districtName) = "it" && (STR(?districtName) = "Alta Valle Isarco")) .
+BIND ("2025-04-05T00:00:00Z"^^xsd:dateTime AS ?start_time) .
+BIND ("2025-04-15T00:00:00Z"^^xsd:dateTime AS ?end_time) .
+BIND ("SENTINEL1_GRD" AS ?satellite) .
+BIND ("[VV, VH]" AS ?band1) .
+BIND (openeo:load_collection(?satellite, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
+BIND (openeo:sar_backscatter(?coll1, '{"coefficient": "sigma0-ellipsoid"}') AS ?coll2) .
+BIND (openeo:band_math(?coll2, "4 * x2 / (x1 + x2)") AS ?RVIData) .
+}
+
+"""
+
+[[tabGroups.tabs]]
+
+name="Q6. Oil Spills"
+query="""
+# Find oil spill data in southern coast of Kuwait near the resort community of Al Khiran (reported in 2017)
+PREFIX : <http://www.unibz-openeo.org#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX openeo: <http://www.openeo-ontop.org#>
+SELECT ?oilSpillData {
+BIND("POLYGON((48.325487506118264 28.742803969343313, 48.325487506118264 28.414218984218607, 48.75387693420447 28.414218984218607, 48.75387693420447 28.742803969343313, 48.325487506118264 28.742803969343313))"^^geo:wktLiteral AS ?geom) .
+BIND ("2023-09-01T00:00:00Z"^^xsd:dateTime AS ?start_time) .
+BIND ("2023-09-07T00:00:00Z"^^xsd:dateTime AS ?end_time) .
+BIND ("SENTINEL1_GRD" AS ?satellite_instrument) .
+BIND ("VV" AS ?band1) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
+BIND (openeo:sar_backscatter(?coll1, '{"coefficient": "sigma0-ellipsoid"}') AS ?coll2) .
+BIND (openeo:log(10) AS ?log10) .
+BIND (openeo:apply(10 * openeo:log(?coll2, 10)) AS ?coll3) .
+# Smaller kernel size chosen for adaptive thresholding 5x5
+# Adaptive thresholding: Kernel will slide over the image, and for each central pixel, the average of the surrounding nxn area will be computed
+BIND (openeo:apply_kernel(?coll3, '{"kernel": [ [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ] ], "factor": 0}') AS ?coll4) .
+BIND (openeo:rename_labels(?coll3, "bands", "amplitude") AS ?coll5) .
+BIND (openeo:apply(?coll4 - 3.5) AS ?coll6) .
+BIND (openeo:rename_labels(?coll6, "bands", "threshold") AS ?coll7) .
+BIND (openeo:merge_cubes(?coll5, ?coll7) AS ?coll8) .
+BIND (openeo:reduce_dimension(?coll8, "bands", "amplitude < threshold") AS ?v) .
+}
+"""
+
+[[tabGroups.tabs]]
+
+name="Q7. NO2 Emissions"
+query="""
+# Find NO2 emisssions South Tyrol before and after COVID
+PREFIX : <http://www.unibz-openeo.org#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX openeo: <http://www.openeo-ontop.org#>
+SELECT ?regionName ?preCovidNO2 ?postCovidNO2 {
+?municipality a :SouthTyrolMuni .
+?municipality geo:asWKT ?geom .
+?municipality rdfs:label ?regionName .
+FILTER(?regionName = "Bolzano") .
+# Before COVID
+BIND ("2020-06-01T00:00:00Z"^^xsd:dateTime AS ?start_time1) .
+BIND ("2021-06-30T00:00:00Z"^^xsd:dateTime AS ?end_time1) .
+# After COVID
+BIND ("2022-06-01T00:00:00Z"^^xsd:dateTime AS ?start_time2) .
+BIND ("2023-06-30T00:00:00Z"^^xsd:dateTime AS ?end_time2) .
+# 7x7 km resolution per pixel
+BIND ("SENTINEL_5P_L2" AS ?satellite_instrument) .
+BIND ("NO2" AS ?band) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time1, ?end_time1, ?band) AS ?coll1) .
+BIND (openeo:aggregate_temporal_period(?coll1, "day", "mean") AS ?coll2) .
+BIND (openeo:aggregate_spatial(?coll2, ?geom, "mean") AS ?preCovidNO2) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time2, ?end_time2, ?band) AS ?coll3) .
+BIND (openeo:aggregate_temporal_period(?coll3, "day", "mean") AS ?coll4) .
+BIND (openeo:aggregate_spatial(?coll4, ?geom, "mean") AS ?postCovidNO2) .
+}
+"""
+
+[[tabGroups.tabs]]
+
+name="Q8. Soil Moisture"
+query="""
+PREFIX : <http://www.unibz-openeo.org#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX openeo: <http://www.openeo-ontop.org#>
+SELECT ?regionName ?soilMoistureData {
+?municipality a :SouthTyrolMuni .
+?municipality geo:asWKT ?geom .
+?municipality rdfs:label ?regionName .
+FILTER(?regionName = "Bolzano")
+BIND ("2023-09-01T00:00:00Z"^^xsd:dateTime AS ?start_time) .
+BIND ("2023-09-07T00:00:00Z"^^xsd:dateTime AS ?end_time) .
+BIND ("2023-09-14T00:00:00Z"^^xsd:dateTime AS ?end_time2) .
+BIND ("SENTINEL1_GRD" AS ?satellite_instrument) .
+BIND ("VV" AS ?band1) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
+BIND (openeo:sar_backscatter(?coll1, '{"coefficient": "sigma0-ellipsoid"}') AS ?coll2) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?end_time, ?end_time2, ?band1) AS ?coll3) .
+BIND (openeo:sar_backscatter(?coll3, '{"coefficient": "sigma0-ellipsoid"}') AS ?coll4) .
+BIND (openeo:reduce_dimension(?coll4, "t", "last") AS ?coll5) .
+BIND (openeo:reduce_dimension(?coll2, "t", "min") AS ?coll6) .
+BIND (openeo:reduce_dimension(?coll2, "t", "max") AS ?coll7) .
+BIND (openeo:merge_cubes(?coll5, ?coll6, "subtract") AS ?coll8) .
+BIND (openeo:merge_cubes(?coll7, ?coll6, "subtract") AS ?coll9) .
+BIND (openeo:merge_cubes(?coll8, ?coll9, "divide") AS ?coll10) .
+BIND (openeo:reduce_dimension(?coll2, "t", "mean") AS ?coll11) .
+BIND (openeo:apply(10 * openeo:log(?coll11, 10)) AS ?coll12) .
+BIND (openeo:filter_bands(?coll12, "VV") AS ?coll13) .
+#BIND (openeo:apply(?coll13 <= -6) AS ?coll14) .
+BIND (openeo:reduce_dimension(?coll13, "bands", "data >= -17") AS ?soilMoistureData) .
+}
+"""
+

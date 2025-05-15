@@ -1,0 +1,22 @@
+arg1 : {
+  "process_id": arg2,
+  "arguments": {
+    "data": {
+      "from_node": arg3
+    },
+    "period": arg4,
+    "reducer": {
+        "process_graph": {
+          "agg1": {
+            "process_id": arg5,
+            "arguments": {
+              "data": {
+                "from_parameter": "data"
+              }
+            },
+            "result": true
+          }
+        }
+      }
+    }
+  }

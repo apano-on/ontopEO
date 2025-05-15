@@ -1,0 +1,16 @@
+arg1: {
+      "process_id": arg2,
+      "arguments": {
+        "id": arg3,
+        "spatial_extent": {
+          arg4
+        },
+        "temporal_extent": [
+          arg5,
+          arg6
+        ],
+        "bands": [
+          arg7
+        ]
+      }
+    }

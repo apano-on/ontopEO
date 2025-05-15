@@ -1,0 +1,23 @@
+arg1: {
+  "process_id": arg2,
+  "arguments": {
+        "cube1": {"from_node": arg3},
+        "cube2": {"from_node": arg4},
+        "overlap_resolver" : {
+          "process_graph": {
+            "operation1": {
+              "process_id": arg5,
+              "arguments": {
+                "x": {
+                  "from_parameter": "x"
+                },
+                "y": {
+                  "from_parameter": "y"
+                }
+              },
+              "result": true
+            }
+          }
+        }
+      }
+}

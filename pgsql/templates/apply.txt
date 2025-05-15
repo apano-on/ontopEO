@@ -1,0 +1,22 @@
+arg1: {
+      "process_id": arg2,
+      "arguments": {
+        "data": {
+          "from_node": arg3
+        },
+        "process": {
+          "process_graph": {
+            "default1": {
+              "process_id": arg4,
+              "arguments": {
+                "x": {
+                  "from_parameter": "x"
+                },
+                "y": arg5
+              },
+              "result": true
+            }
+          }
+        }
+      }
+    }

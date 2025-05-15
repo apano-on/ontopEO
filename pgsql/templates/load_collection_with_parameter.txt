@@ -1,0 +1,32 @@
+arg1: {
+      "process_id": arg2,
+      "arguments": {
+        "id": arg3,
+        "spatial_extent": {
+          arg4
+        },
+        "temporal_extent": [
+          arg5,
+          arg6
+        ],
+        "bands": [
+          arg7
+        ],
+     "properties": {
+       arg8: {
+         "process_graph": {
+           "fct1": {
+             "process_id": arg9,
+             "arguments": {
+               "x": {
+                 "from_parameter": "value"
+               },
+               "y": arg10
+             },
+             "result": true
+           }
+         }
+       }
+     }
+      }
+    }

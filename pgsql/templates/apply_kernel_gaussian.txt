@@ -1,0 +1,9 @@
+arg1: {
+      "process_id": "apply_kernel",
+      "arguments": {
+        "data": {
+          "from_node": arg2
+        },
+        "kernel": arg3
+      }
+    }

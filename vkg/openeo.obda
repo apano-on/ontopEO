@@ -1,0 +1,32 @@
+[PrefixDeclaration]
+:		http://www.unibz-openeo.org#
+geo:		http://www.opengis.net/ont/geosparql#
+owl:		http://www.w3.org/2002/07/owl#
+rdf:		http://www.w3.org/1999/02/22-rdf-syntax-ns#
+xml:		http://www.w3.org/XML/1998/namespace
+xsd:		http://www.w3.org/2001/XMLSchema#
+rdfs:		http://www.w3.org/2000/01/rdf-schema#
+sosa:		http://www.w3.org/ns/sosa/
+openeo:		http://www.openeo-ontop.org#
+
+[MappingDeclaration] @collection [[
+mappingId	vector_data_wildfires_southtyrol
+target		:regionST/{"istat_code_t"} a :SouthTyrolMuni ; geo:asWKT {"geom1"}^^geo:wktLiteral ; rdfs:label {"name_it"}@it ; :belongsToDistrict {"distr_it"}@it .
+source		select "istat_code_t", "name_it", "distr_it", ST_ASTEXT("geom2d") AS "geom1" from municipalities_polygon
+
+mappingId	population_data_wildfires_southtyrol
+target		:regionST/{"CodiceComune"} :population {"PopolazioneTotale"}^^xsd:integer .
+source		select "CodiceComune", "PopolazioneTotale" from population_south_tyrol
+
+mappingId	vector_data_landslides_ischia
+target		:regionCampania/{"gid"} a :CampaniaMuni ; geo:asWKT {"geom1"}^^geo:wktLiteral ; rdfs:label {"comune"}@it .
+source		select "gid", "comune", ST_AsText(ST_Transform("geom", 4326)) as "geom1" from region_campania
+
+mappingId	vector_data_heatwaves_NL
+target		:dutchNeighborhood/{"gid"} a :DutchNeighborhood ; geo:asWKT {"geom1"}^^geo:wktLiteral ; rdfs:label {"bu_naam"}@nl ; :belongsToMunicipality {"gm_naam"}@nl ; :belongsToDistrict {"gm_naam"}@nl .
+source		select "gid", "bu_naam", "wk_naam", "gm_naam", ST_AsText(ST_Transform("geom", 4326)) as "geom1" from region_netherlands
+
+mappingId	vector_data_european_regions
+target		:euregion/{"gid"} a :EuropeanRegion ; geo:asWKT {"geom1"}^^geo:wktLiteral ; rdfs:label {"name"} .
+source		select "gid", "name", ST_ASTEXT(ST_TRANSFORM("geom", 4326)) AS "geom1" from europeanregions_polygon
+]]

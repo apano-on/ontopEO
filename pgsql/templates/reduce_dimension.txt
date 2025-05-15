@@ -1,0 +1,22 @@
+arg1: {
+      "process_id": arg2,
+      "arguments": {
+        "data": {
+          "from_node": arg3
+        },
+        "reducer": {
+          "process_graph": {
+            "generic": {
+              "process_id": arg5,
+              "arguments": {
+                "data": {
+                  "from_parameter": "data"
+                }
+              },
+              "result": true
+            }
+          }
+        },
+        "dimension": arg4
+      }
+    }

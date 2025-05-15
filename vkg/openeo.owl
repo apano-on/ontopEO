@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.unibz-openeo.org#"
+     xml:base="http://www.unibz-openeo.org#"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:skos="http://www.w3.org/2004/02/skos/core#">
+    <owl:Ontology rdf:about="http://www.unibz-openeo.org#">
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Quantities, Units, Dimensions and Types (QUDT) - Level 1</rdfs:label>
+        <owl:versionInfo rdf:datatype="http://www.w3.org/2001/XMLSchema#string">$Id: OSG_qudt-(v1.1).ttl 4989 2011-06-01 21:56:40Z RalphHodgson $</owl:versionInfo>
+    </owl:Ontology>
+
+    <owl:ObjectProperty rdf:about="http://www.unibz-openeo.org#hasBand">
+        <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Satellite has band</dc:description>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">hasBand</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:Class rdf:about="http://www.unibz-openeo.org#Satellite"/>
+
+</rdf:RDF>

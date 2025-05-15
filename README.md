@@ -8,7 +8,7 @@ platform.
 This repository contains the pipeline and requirements for the project OntoEO.
 
 Its components are the following:
-- The code/branch of Ontop with the openEO functions
+- The code/branch of Ontop with the openEO functions which can be found in [ontop/openeo-v2](https://github.com/apano-on/ontop/tree/feature/openeo-v2)
 - A pipeline which loads geospatial and other data into a PostgreSQL database
 - PL/Python functions which enable querying of openEO which can
 be found in the folder openEO

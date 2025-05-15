@@ -1,0 +1,43 @@
+arg1: {
+      "process_id": arg2,
+      "arguments": {
+        "data": {
+          "from_node": arg3
+        },
+        "reducer": {
+          "process_graph": {
+            "arrayelement1": {
+                                        "process_id": "array_element",
+                                        "arguments": {
+                                            "data": {
+                                                "from_parameter": "data"
+                                            },
+                                            "index": 0
+                                        }
+                                    },
+                                    "arrayelement2": {
+                                        "process_id": "array_element",
+                                        "arguments": {
+                                            "data": {
+                                                "from_parameter": "data"
+                                            },
+                                            "index": 1
+                                        }
+                                    },
+                                    "lt1": {
+                                        "process_id": arg5,
+                                        "arguments": {
+                                            "x": {
+                                                "from_node": "arrayelement1"
+                                            },
+                                            "y": {
+                                                "from_node": "arrayelement2"
+                                            }
+                                        },
+                                        "result": true
+                                    }
+          }
+        },
+        "dimension": arg4
+      }
+    }

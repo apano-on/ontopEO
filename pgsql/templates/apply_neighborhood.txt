@@ -1,0 +1,46 @@
+arg1: {
+    "process_id": arg2,
+    "arguments": {
+      "data": {
+        "from_node": arg3
+      },
+      "process": {
+                "process_graph": {
+                  "arrayapply1": {
+                    "process_id": "array_apply",
+                    "arguments": {
+                      "data": {
+                        "from_parameter": "data"
+                      },
+                      "process": {
+                        "process_graph": {
+                          "max1": {
+                            "process_id": arg5,
+                            "arguments": {
+                              "data": {
+                                "from_parameter": "data"
+                              }
+                            }
+                          },
+                          "neq1": {
+                            "process_id": arg4,
+                            "arguments": {
+                              "x": {
+                                "from_parameter": "x"
+                              },
+                              "y": {
+                                "from_node": "max1"
+                              }
+                            },
+                            "result": true
+                          }
+                        }
+                      }
+                    },
+                    "result": true
+                  }
+                }
+              },
+      arg6
+    }
+  }

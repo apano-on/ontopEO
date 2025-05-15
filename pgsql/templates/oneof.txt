@@ -1,0 +1,13 @@
+arg1: {
+      "process_id": "apply",
+      "arguments": {
+        "data": {
+          "from_node": arg2
+        },
+        "process": {
+          "process_graph":
+            arg3
+
+        }
+      }
+    }

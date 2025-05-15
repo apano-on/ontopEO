@@ -1,0 +1,7 @@
+arg1: {
+  "process_id": arg2,
+  "arguments": {
+        "cube1": {"from_node": arg3},
+        "cube2": {"from_node": arg4}
+      }
+}

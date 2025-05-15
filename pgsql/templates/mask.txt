@@ -1,0 +1,11 @@
+arg1: {
+      "process_id": arg2,
+      "arguments": {
+        "data": {
+          "from_node": arg3
+        },
+        "mask": {
+          "from_node": arg4
+        }
+      }
+    }
