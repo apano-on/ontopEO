@@ -46,7 +46,7 @@ In order to run the experiments. Please execute from the root directory of this 
 docker compose up
 ```
 This will initialize a PostgreSQL database at port 7777 and
-Ontop at port 8080 where you can run the example queries.
+Ontop at port 8081 where you can run the example queries.
 
 
 ### Reference metadata

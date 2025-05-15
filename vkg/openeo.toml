@@ -36,7 +36,7 @@ BIND (xsd:double(?v) AS ?average_NDVI)
 [[tabGroups.tabs]]
 
 name="Q2. Heatwave"
-query="""
+query='''
 PREFIX : <http://www.unibz-openeo.org#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX geo: <http://www.opengis.net/ont/geosparql#>
@@ -61,7 +61,7 @@ BIND ("import xarray\\nimport numpy as np\\nfrom openeo.udf import inspect\\n\\n
 BIND (openeo:apply_dimension(?coll4, "t", ?udf) AS ?coll5) .
 BIND (openeo:reduce_dimension(?coll5, "t", "sum") AS ?heatwaveData) .
 }
-"""
+'''
 
 [[tabGroups.tabs]]
 
