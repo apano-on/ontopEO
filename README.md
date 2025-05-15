@@ -49,3 +49,7 @@ This will initialize a PostgreSQL database at port 7777 and
 Ontop at port 8080 where you can run the example queries.
 
 
+### Reference metadata
+DOI: 10.5281/zenodo.15409222
+
+apano-on. apano-on/ontopEO: beta-1 (beta-1). Zenodo, 2025. DOI: https://doi.org/10.5281/zenodo.15423395.
