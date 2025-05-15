@@ -25,20 +25,23 @@ All of the files should be placed in ... and imported via ...
 Executing the example queries requires access to an openEO cloud provider. 
 The recommended provider is Copernicus where any user needs to follow the instructions and:
 - Register for an account and obtain a user ID: https://documentation.dataspace.copernicus.eu/Registration.html
-- Log in and navigate to Sentinel Hub ![user page](CopernicusUserPage.png)
+- Log in and navigate to Sentinel Hub 
+
+<img src="CopernicusUserPage.png" alt="user page" width="300">
+
 - Navigate to "User Settings" below on the left and add an OAuth2 client secret
 
-Action: Set in the file `.env` the two respective environment variables
+**Action**: Set in the file `.env` the two respective environment variables
 `USER_OPENEO_CLIENT_ID` and `USER_OPENEO_CLIENT_SECRET`
 based on the credentials generated in openEO
 
 ## Ontop
-Our extension of Ontop has been added as a branch ...
+Our extension of Ontop has been added as a branch [ontop/openeo-v2](https://github.com/apano-on/ontop/tree/feature/openeo-v2)
 
-We have also created a docker image for it ...
+We have also created a docker image for it [ontop-openeo](https://hub.docker.com/repository/docker/albulenpano/ontop-openeo/general)
 
 ## Execution
-In order to run the experiments. Please run:
+In order to run the experiments. Please execute from the root directory of this project:
 ```
 docker compose up
 ```
