@@ -17,12 +17,12 @@ FILTER(LANG(?municipalityName) = "it")
 FILTER(LANG(?districtName) = "it" && (STR(?districtName) = "Val Venosta")) .
 BIND ("2025-04-05T00:00:00Z"^^xsd:dateTime AS ?start_time) .
 BIND ("2025-04-15T00:00:00Z"^^xsd:dateTime AS ?end_time) .
-BIND ("SENTINEL2_L2A" AS ?satellite) .
+BIND ("SENTINEL2_L2A" AS ?satellite_instrument) .
 BIND ("[B04, B08]" AS ?band1) .
-BIND (openeo:load_collection(?satellite, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
 BIND (openeo:ndvi(?coll1) AS ?coll2) .
 BIND (openeo:reduce_dimension(?coll2, "t", "mean") AS ?coll3) .
-BIND (openeo:aggregate_spatial(?coll3, "t", "mean") AS ?v) .
+BIND (openeo:aggregate_spatial(?coll3, ?geom, "mean") AS ?v) .
 BIND (xsd:double(?v) AS ?average_NDVI)
 }
 """
@@ -50,12 +50,12 @@ FILTER(LANG(?municipalityName) = "it")
 FILTER(LANG(?districtName) = "it" && (STR(?districtName) = "Val Venosta")) .
 BIND ("2025-04-05T00:00:00Z"^^xsd:dateTime AS ?start_time) .
 BIND ("2025-04-15T00:00:00Z"^^xsd:dateTime AS ?end_time) .
-BIND ("SENTINEL2_L2A" AS ?satellite) .
+BIND ("SENTINEL2_L2A" AS ?satellite_instrument) .
 BIND ("[B04, B08]" AS ?band1) .
-BIND (openeo:load_collection(?satellite, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
+BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
 BIND (openeo:ndvi(?coll1) AS ?coll2) .
 BIND (openeo:reduce_dimension(?coll2, "t", "mean") AS ?coll3) .
-BIND (openeo:aggregate_spatial(?coll3, "t", "mean") AS ?v) .
+BIND (openeo:aggregate_spatial(?coll3, ?geom, "mean") AS ?v) .
 BIND (xsd:double(?v) AS ?average_NDVI)
 }
 """
