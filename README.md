@@ -57,7 +57,7 @@ be removed or commented using a semicolon ";".
 
 ### Ontology
 No ontology was used for this example. However, to extend the demo, please add the 
-ontology to the [vk](./vkg/) folder and specify in the [docker compose file](docker-compose.yml) the property
+ontology to the [vkg](./vkg/) folder and specify in the [docker compose file](docker-compose.yml) the property
 "ONTOP_ONTOLOGY_FILE".
 
 ## Running the demo
