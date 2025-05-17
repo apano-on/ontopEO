@@ -29,7 +29,7 @@ data has already been added in this repo
 
 All of the files should be placed in [db_import/data](./db_import/data) and a respective
 script to import the files should be updated in [db_import/import_data.sh](./db_import/import_data.sh).
-For the PostGIS backend services like shp2pgsql and ogr2ogr can import the data.
+For the PostGIS backend services like shp2pgsql and ogr2ogr can import the data.##
 
 ### openEO
 Executing the example queries requires access to an openEO cloud provider. 
@@ -46,12 +46,19 @@ The recommended provider is Copernicus where any user needs to follow the instru
 based on the credentials generated in openEO
 
 ### Ontop
+### Source code
 We have also created a docker image for [ontop-openeo](https://hub.docker.com/repository/docker/albulenpano/ontop-openeo/general)
 which we use in this example and can be updated in the docker compose file.
 
+### Mappings
 For every new dataset being mapped from the PostgreSQL database to Ontop, a respective mapping
 needs to be added in [vkg/openeo.obda](./vkg/openeo.obda). Note, that unused mappings can
 be removed or commented using a semicolon ";".
+
+### Ontology
+No ontology was used for this example. However, to extend the demo, please add the 
+ontology to the [vk](./vkg/) folder and specify in the [docker compose file](docker-compose.yml) the property
+"ONTOP_ONTOLOGY_FILE".
 
 ## Running the demo
 In order to run the experiments. Please execute from the root directory of this project:
