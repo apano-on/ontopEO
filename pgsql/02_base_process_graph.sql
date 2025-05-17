@@ -382,8 +382,14 @@ async def run_openeo_job(process_graph, client_id, client_secret):
             if isinstance(result, openeo.rest.job.ResultAsset) and "timeseries.json" in result.href:
                 import requests
                 response = requests.get(result.href)
-                return response.json()
+                # Try to extract [0][0] if possible
+                try:
+                    return response.json()[0][0]
+                except (IndexError, TypeError, KeyError):
+                    # If it fails, return the full JSON response instead
+                    return response.json()
 
+            #TODO: Redundant?
             # Attempt to load JSON and return a numeric value
             final_result = result.load_json()
             return final_result[0][0]
