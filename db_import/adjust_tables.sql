@@ -44,3 +44,7 @@ ALTER TABLE municipalities_polygon
 
 UPDATE municipalities_polygon
 SET geom2d = ST_TRANSFORM(ST_FORCE2d("geom"),4326);
+
+-- Add PK to South Tyrol population table
+ALTER TABLE population_south_tyrol
+    ADD CONSTRAINT municipalities_pkey PRIMARY KEY ("CodiceComune");
