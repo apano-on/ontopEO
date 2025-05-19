@@ -255,8 +255,9 @@ def convert_quoted_numbers(process_graph_str):
     Converts quoted numbers in JSON string to actual numbers
     for keys 'x', 'y', or 'base'.
     For example: "y": "16384" becomes "y": 16384
+    Handle negatives, scientific notation, and spaces.
     """
-    pattern = r'("(?:x|y|base)":\s*)"(\d+(?:\.\d+)?)"'
+    pattern = r'("(?:x|y|base)":\s*)"(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)"'
     return re.sub(pattern, r'\1\2', process_graph_str)
 
 def transform_band_list(text):

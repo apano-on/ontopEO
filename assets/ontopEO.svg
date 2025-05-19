@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background shapes -->
+  <defs>
+    <linearGradient id="earthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e88e5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0d47a1;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dataGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#43a047;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2e7d32;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Earth/globe layer (representing Copernicus data) -->
+  <circle cx="120" cy="100" r="70" fill="url(#earthGradient)" opacity="0.9" />
+  
+  <!-- Orbital rings (representing data integration) -->
+  <ellipse cx="120" cy="100" rx="70" ry="25" fill="none" stroke="#90caf9" stroke-width="2" stroke-dasharray="3,2" />
+  <ellipse cx="120" cy="100" rx="60" ry="55" fill="none" stroke="#90caf9" stroke-width="2" stroke-dasharray="3,2" transform="rotate(45 120 100)" />
+  
+  <!-- Data cube (representing the database/VKG) -->
+  <g transform="translate(200, 60)">
+    <!-- Top face -->
+    <polygon points="0,0 60,0 90,30 30,30" fill="url(#dataGradient)" />
+    <!-- Right face -->
+    <polygon points="90,30 90,70 60,40 60,0" fill="#1b5e20" />
+    <!-- Front face -->
+    <polygon points="30,30 90,30 90,70 30,70" fill="#2e7d32" />
+    
+    <!-- Connection lines -->
+    <line x1="30" y1="50" x2="-10" y2="50" stroke="#ff9800" stroke-width="3" />
+    <line x1="-10" y1="50" x2="-80" y2="50" stroke="#ff9800" stroke-width="3" stroke-dasharray="5,3" />
+  </g>
+  
+  <!-- Text elements -->
+  <g transform="translate(200, 150)">
+    <text font-family="Arial, sans-serif" font-weight="bold" font-size="32" fill="#263238">
+      <tspan fill="#0d47a1">ontop</tspan><tspan fill="#2e7d32">EO</tspan>
+    </text>
+  </g>
+  
+  <!-- Data flow dots -->
+  <circle cx="170" cy="110" r="3" fill="#ff9800" />
+  <circle cx="155" cy="110" r="3" fill="#ff9800" />
+  <circle cx="140" cy="110" r="3" fill="#ff9800" />
+  
+  <!-- Small satellite icon -->
+  <g transform="translate(80, 30) scale(0.6) rotate(-15)">
+    <rect x="0" y="0" width="30" height="10" fill="#78909c" />
+    <rect x="10" y="-15" width="10" height="15" fill="#78909c" />
+    <rect x="-20" y="3" width="20" height="4" fill="#b0bec5" />
+    <rect x="30" y="3" width="20" height="4" fill="#b0bec5" />
+  </g>
+</svg>

@@ -36,6 +36,7 @@ name="Sample Queries"
 name="Q1. NDVI"
 query="""
 # Find NDVI for Val Venosta region municipalities
+# Source: https://documentation.dataspace.copernicus.eu/notebook-samples/openeo/NDVI_Timeseries.html
 PREFIX : <http://www.unibz-openeo.org#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX geo: <http://www.opengis.net/ont/geosparql#>
@@ -64,6 +65,8 @@ BIND (xsd:double(?v) AS ?average_NDVI)
 
 name="Q2. Heatwave"
 query='''
+# Find heatwave days in areas of the Netherlands
+# Source: https://documentation.dataspace.copernicus.eu/APIs/openEO/openeo-community-examples/python/Heatwave/HeatwaveNL.html
 PREFIX : <http://www.unibz-openeo.org#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX geo: <http://www.opengis.net/ont/geosparql#>
@@ -81,11 +84,15 @@ BIND ("SENTINEL3_SLSTR_L2_LST" AS ?satellite_instrument) .
 BIND ("LST" AS ?band1) .
 BIND ("confidence_in" AS ?band2) .
 BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
+
+# Apply cloud masking
 BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band2) AS ?coll2) .
 BIND (openeo:apply(?coll2 >= 16384) AS ?coll3) .
 BIND (openeo:mask(?coll1, ?coll3) AS ?coll4) .
 BIND ("import xarray\\nimport numpy as np\\nfrom openeo.udf import inspect\\n\\ndef apply_datacube(cube: xarray.DataArray, context: dict) -> xarray.DataArray:\\n    \\n    array = cube.values\\n    inspect(data=[array.shape], message = \\\"Array dimensions\\\")\\n    res_arr=np.zeros(array.shape)\\n    for i in range(array.shape[0]-4):\\n        ar_sub=np.take(array,  range(i, i+5), axis=0)\\n        res_arr[i]=(np.all(ar_sub>295,axis=0)) & (np.nansum(ar_sub>300,axis=0)>2)\\n    return xarray.DataArray(res_arr, dims=cube.dims, coords=cube.coords)" AS ?udf) .
 BIND (openeo:apply_dimension(?coll4, "t", ?udf) AS ?coll5) .
+
+# Count the total number of times each pixels had a heat wave
 BIND (openeo:reduce_dimension(?coll5, "t", "sum") AS ?heatwaveData) .
 }
 '''
@@ -95,6 +102,7 @@ BIND (openeo:reduce_dimension(?coll5, "t", "sum") AS ?heatwaveData) .
 name="Q3. Wildfire"
 query="""
 # Find wildfires in municipalities of the Venosta Valley in South Tyrol and impacted population
+# Source: https://documentation.dataspace.copernicus.eu/APIs/openEO/openeo-community-examples/python/ForestFire/ForestFire.html
 PREFIX : <http://www.unibz-openeo.org#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX geo: <http://www.opengis.net/ont/geosparql#>
@@ -118,10 +126,14 @@ BIND ("1.6"^^xsd:double AS ?stdev) .
 BIND (openeo:load_collection(?satellite, ?geom, ?start_time, ?end_time, ?band1, "eo:cloud_cover<=90") AS ?coll1) .
 BIND (openeo:load_collection(?satellite, ?geom, ?start_time, ?end_time, ?band2, "eo:cloud_cover<=90") AS ?coll2) .
 BIND (openeo:ndvi(?coll1) AS ?coll3) .
+
+# Identify cloud-free pixels in the available datacube
 BIND (openeo:oneof(?coll2, "3"^^xsd:integer || "8"^^xsd:integer || "9"^^xsd:integer || "10"^^xsd:integer) AS ?coll4) .
 BIND (openeo:apply_kernel(?coll4, ?dimension, ?stdev) AS ?coll5) .
 BIND (openeo:apply(?coll5 >= 98) AS ?coll6) .
 BIND (openeo:mask(?coll3, ?coll6) AS ?coll7) .
+
+# Return wildfire data
 BIND (openeo:reduce_dimension(?coll7, "t", "first") AS ?wildfireData) .
 }
 """
@@ -131,6 +143,7 @@ BIND (openeo:reduce_dimension(?coll7, "t", "first") AS ?wildfireData) .
 name="Q4. Landslides"
 query="""
 # Find landslides by municipality in Ischia, Campania, Italy
+# Source: https://documentation.dataspace.copernicus.eu/APIs/openEO/openeo-community-examples/python/LandslideNDVI/LandslidesNDVI.html
 PREFIX : <http://www.unibz-openeo.org#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX geo: <http://www.opengis.net/ont/geosparql#>
@@ -142,10 +155,13 @@ SELECT ?municipalityName ?landslideData {
 ?municipality rdfs:label ?municipalityName .
 FILTER(LANG(?municipalityName) = "it" && (STR(?municipalityName) = "Ischia") || (STR(?municipalityName) = "Casamicciola Terme") || (STR(?municipalityName) = "Lacco Ameno")
 || (STR(?municipalityName) = "Forio") || (STR(?municipalityName) = "Barano d'Ischia") || (STR(?municipalityName) = "Serrara Fontana")) .
+
+# Choose time periods before and after the landslides
 BIND ("2022-08-25T00:00:00Z"^^xsd:dateTime AS ?start_time) .
 BIND ("2022-11-25T00:00:00Z"^^xsd:dateTime AS ?end_time) .
 BIND ("2022-11-26T00:00:00Z"^^xsd:dateTime AS ?start_time2) .
 BIND ("2022-12-25T00:00:00Z"^^xsd:dateTime AS ?end_time2) .
+
 BIND ("SENTINEL2_L2A" AS ?satellite_instrument) .
 BIND ("[B04, B08]" AS ?band1) .
 BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
@@ -154,6 +170,8 @@ BIND (openeo:reduce_dimension(?coll2, "t", "mean") AS ?coll3) .
 BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time2, ?end_time2, ?band1) AS ?coll4) .
 BIND (openeo:ndvi(?coll4) AS ?coll5) .
 BIND (openeo:reduce_dimension(?coll5, "t", "mean") AS ?coll6) .
+
+# Find the NDVI difference before and after the landslides
 BIND (openeo:merge_cubes(?coll6, ?coll3, "subtract") AS ?landslideData) .
 }
 """
@@ -163,6 +181,7 @@ BIND (openeo:merge_cubes(?coll6, ?coll3, "subtract") AS ?landslideData) .
 name="Q5. Radar Vegetation Index"
 query="""
 # Find Radar Vegetation Index in  South Tyrol
+# Source: https://documentation.dataspace.copernicus.eu/APIs/openEO/openeo-community-examples/python/RVI/RVI.html
 PREFIX : <http://www.unibz-openeo.org#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX geo: <http://www.opengis.net/ont/geosparql#>
@@ -181,6 +200,7 @@ BIND ("SENTINEL1_GRD" AS ?satellite) .
 BIND ("[VV, VH]" AS ?band1) .
 BIND (openeo:load_collection(?satellite, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
 BIND (openeo:sar_backscatter(?coll1, '{"coefficient": "sigma0-ellipsoid"}') AS ?coll2) .
+# Apply RVI formula
 BIND (openeo:band_math(?coll2, "4 * x2 / (x1 + x2)") AS ?RVIData) .
 }
 
@@ -191,11 +211,13 @@ BIND (openeo:band_math(?coll2, "4 * x2 / (x1 + x2)") AS ?RVIData) .
 name="Q6. Oil Spills"
 query="""
 # Find oil spill data in southern coast of Kuwait near the resort community of Al Khiran (reported in 2017)
+# Source: https://documentation.dataspace.copernicus.eu/APIs/openEO/openeo-community-examples/python/OilSpill/OilSpillMapping.html
 PREFIX : <http://www.unibz-openeo.org#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX geo: <http://www.opengis.net/ont/geosparql#>
 PREFIX openeo: <http://www.openeo-ontop.org#>
 SELECT ?oilSpillData {
+# We use a fixed polygon representing the area of interest
 BIND("POLYGON((48.325487506118264 28.742803969343313, 48.325487506118264 28.414218984218607, 48.75387693420447 28.414218984218607, 48.75387693420447 28.742803969343313, 48.325487506118264 28.742803969343313))"^^geo:wktLiteral AS ?geom) .
 BIND ("2023-09-01T00:00:00Z"^^xsd:dateTime AS ?start_time) .
 BIND ("2023-09-07T00:00:00Z"^^xsd:dateTime AS ?end_time) .
@@ -204,11 +226,14 @@ BIND ("VV" AS ?band1) .
 BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
 BIND (openeo:sar_backscatter(?coll1, '{"coefficient": "sigma0-ellipsoid"}') AS ?coll2) .
 BIND (openeo:apply(10 * openeo:log(?coll2, 10)) AS ?coll3) .
+
 # Smaller kernel size chosen for adaptive thresholding 5x5
 # Adaptive thresholding: Kernel will slide over the image, and for each central pixel, the average of the surrounding nxn area will be computed
 BIND (openeo:apply_kernel(?coll3, '{"kernel": [ [ 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1 ], [ 1, 1, 1, 1, 1 ] ], "factor": 0}') AS ?coll4) .
 BIND (openeo:rename_labels(?coll3, "bands", "amplitude") AS ?coll5) .
 BIND (openeo:apply(?coll4 - 3.5) AS ?coll6) .
+
+# Rename band dimension in threshold datacube and compare with original datacube
 BIND (openeo:rename_labels(?coll6, "bands", "threshold") AS ?coll7) .
 BIND (openeo:merge_cubes(?coll5, ?coll7) AS ?coll8) .
 BIND (openeo:reduce_dimension(?coll8, "bands", "amplitude < threshold") AS ?oilSpillData) .
@@ -219,7 +244,8 @@ BIND (openeo:reduce_dimension(?coll8, "bands", "amplitude < threshold") AS ?oilS
 
 name="Q7. NO2 Emissions"
 query="""
-# Find NO2 emisssions South Tyrol before and after COVID
+# Find NO2 emisssions in Bolzano before and after COVID
+# Source: https://documentation.dataspace.copernicus.eu/notebook-samples/openeo/NO2Covid.html
 PREFIX : <http://www.unibz-openeo.org#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX geo: <http://www.opengis.net/ont/geosparql#>
@@ -238,6 +264,8 @@ BIND ("2023-06-30T00:00:00Z"^^xsd:dateTime AS ?end_time2) .
 # 7x7 km resolution per pixel
 BIND ("SENTINEL_5P_L2" AS ?satellite_instrument) .
 BIND ("NO2" AS ?band) .
+
+# Create spatial aggregations to generate mean timeseries data
 BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time1, ?end_time1, ?band) AS ?coll1) .
 BIND (openeo:aggregate_temporal_period(?coll1, "day", "mean") AS ?coll2) .
 BIND (openeo:aggregate_spatial(?coll2, ?geom, "mean") AS ?preCovidNO2) .
@@ -251,35 +279,52 @@ BIND (openeo:aggregate_spatial(?coll4, ?geom, "mean") AS ?postCovidNO2) .
 
 name="Q8. Soil Moisture"
 query="""
+# Estimate soil moisture content using the concept of change detection
+# over a given time interval in Bolzano, Italy
+# Source: https://documentation.dataspace.copernicus.eu/APIs/openEO/openeo-community-examples/python/SurfaceSoilMoisture/SoilMoisture.html
 PREFIX : <http://www.unibz-openeo.org#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX geo: <http://www.opengis.net/ont/geosparql#>
 PREFIX openeo: <http://www.openeo-ontop.org#>
-SELECT ?regionName ?soilMoistureData {
+SELECT ?municipalityName ?soilMoistureData {
 ?municipality a :SouthTyrolMuni .
 ?municipality geo:asWKT ?geom .
-?municipality rdfs:label ?regionName .
-FILTER(?regionName = "Bolzano")
+?municipality rdfs:label ?municipalityName .
+
+# Select municipality of interest
+FILTER(LANG(?municipalityName) = "it" && (STR(?municipalityName) = "Bolzano")) .
+
+# Find time periods for comparison
 BIND ("2023-09-01T00:00:00Z"^^xsd:dateTime AS ?start_time) .
 BIND ("2023-09-07T00:00:00Z"^^xsd:dateTime AS ?end_time) .
 BIND ("2023-09-14T00:00:00Z"^^xsd:dateTime AS ?end_time2) .
+
 BIND ("SENTINEL1_GRD" AS ?satellite_instrument) .
 BIND ("VV" AS ?band1) .
 BIND (openeo:load_collection(?satellite_instrument, ?geom, ?start_time, ?end_time, ?band1) AS ?coll1) .
 BIND (openeo:sar_backscatter(?coll1, '{"coefficient": "sigma0-ellipsoid"}') AS ?coll2) .
 BIND (openeo:load_collection(?satellite_instrument, ?geom, ?end_time, ?end_time2, ?band1) AS ?coll3) .
 BIND (openeo:sar_backscatter(?coll3, '{"coefficient": "sigma0-ellipsoid"}') AS ?coll4) .
+
+# Derive spatially variable minimum and maximum values, as well as latest snapshot
 BIND (openeo:reduce_dimension(?coll4, "t", "last") AS ?coll5) .
 BIND (openeo:reduce_dimension(?coll2, "t", "min") AS ?coll6) .
 BIND (openeo:reduce_dimension(?coll2, "t", "max") AS ?coll7) .
+
+# Calculate Surface Soil Moisture
+# SSM = (sm_current-dry_ref)/(wet_ref-dry_ref)
 BIND (openeo:merge_cubes(?coll5, ?coll6, "subtract") AS ?coll8) .
 BIND (openeo:merge_cubes(?coll7, ?coll6, "subtract") AS ?coll9) .
 BIND (openeo:merge_cubes(?coll8, ?coll9, "divide") AS ?coll10) .
+
+# Create mask to filter wet and urban areas
 BIND (openeo:reduce_dimension(?coll2, "t", "mean") AS ?coll11) .
 BIND (openeo:apply(10 * openeo:log(?coll11, 10)) AS ?coll12) .
-BIND (openeo:filter_bands(?coll12, "VV") AS ?coll13) .
-#BIND (openeo:apply(?coll13 <= -6) AS ?coll14) .
-BIND (openeo:reduce_dimension(?coll13, "bands", "data >= -17") AS ?soilMoistureData) .
+# Dilter out values above -6dB (probably urban area) and below -17dB (probably water bodies)
+BIND (openeo:apply(?coll12 <= -6) AS ?coll13) .
+BIND (openeo:apply(?coll13 >= -17) AS ?coll14) .
+
+BIND (openeo:mask(?coll10, ?coll14) AS ?soilMoistureData) .
 }
 """
 
