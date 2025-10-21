@@ -10,6 +10,13 @@
 data in Postgresql and openEO data from Copernicus using the [Ontop](https://ontop-vkg.org/]
 platform).
 
+## Development Notes
+
+### Ontop Custom Component
+
+The custom Ontop VKG component development does not occur in this repository. Instead, development happens as branches in the [main Ontop repository](https://github.com/ontop/ontop). This approach ensures compatibility with upstream Ontop releases and facilitates contribution back to the core project.
+For Ontop-specific modifications related to this project, please refer to the relevant branches in the Ontop repository.
+
 ## Description
 In this repository we provide instructions and code on how to run
 a sample pipeline with queries over openEO using a VKG.
